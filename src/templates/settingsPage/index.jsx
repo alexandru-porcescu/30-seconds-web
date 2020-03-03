@@ -6,7 +6,7 @@ import SimpleCard from 'molecules/simpleCard';
 import PageTitle from 'atoms/pageTitle';
 import PropTypes from 'prop-types';
 import Toggle from 'atoms/toggle/index';
-import { toggleDarkMode, toggleGithubLinks } from 'state/shell';
+import { toggleDarkMode, toggleGithubLinks, toggleInfiniteScroll } from 'state/shell';
 import _ from 'lang';
 const _l = _('en');
 
@@ -26,6 +26,7 @@ const SettingsPage = ({
   dispatch,
   isDarkMode,
   hasGithubLinksEnabled,
+  inifiteScrollEnabled,
 }) => {
   return (
     <>
@@ -46,6 +47,14 @@ const SettingsPage = ({
           { _l('Settings') }
         </PageTitle>
         <SimpleCard>
+          <Toggle
+            checked={ !!inifiteScrollEnabled }
+            onChange={ () => {
+              dispatch(toggleInfiniteScroll(!inifiteScrollEnabled));
+            } }
+          >
+            { _l('settings.infinite_scroll') }
+          </Toggle>
           <Toggle
             checked={ !!isDarkMode }
             onChange={ () => {
@@ -83,12 +92,16 @@ SettingsPage.propTypes = {
   isDarkMode: PropTypes.bool,
   /** Are GitHub links enabled? */
   hasGithubLinksEnabled: PropTypes.bool,
+  /** Is infinite scroll enabled? */
+  inifiteScrollEnabled: PropTypes.bool,
 };
 
 export default connect(
   state => ({
     isDarkMode: state.shell.isDarkMode,
     hasGithubLinksEnabled: state.shell.hasGithubLinksEnabled,
+    inifiteScrollEnabled: state.shell.inifiteScrollEnabled,
+
   }),
   null
 )(SettingsPage);

@@ -1,5 +1,10 @@
 import cacheKey from '../../.build/cacheKey';
 
+const isBot = () =>
+  typeof navigator !== 'undefined' &&
+  typeof navigator.userAgent !== 'undefined' &&
+  /bot|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex/i.test(navigator.userAgent);
+
 // Default state
 const initialState = {
   isDarkMode: undefined,
@@ -7,11 +12,14 @@ const initialState = {
   cacheKey,
   newCacheKey: cacheKey,
   acceptsCookies: undefined,
+  isBot: isBot(),
+  inifiteScrollEnabled: !isBot(),
 };
 
 // Actions
 const TOGGLE_DARKMODE = 'TOGGLE_DARKMODE';
 const TOGGLE_GITHUB_LINKS = 'TOGGLE_GITHUB_LINKS';
+const TOGGLE_INFINITE_SCROLL = 'TOGGLE_INFINITE_SCROLL';
 const ACCEPT_COOKIES = 'ACCEPT_COOKIES';
 const DECLINE_COOKIES = 'DECLINE_COOKIES';
 
@@ -23,6 +31,11 @@ export const toggleDarkMode = isDarkMode => ({
 export const toggleGithubLinks = hasGithubLinksEnabled => ({
   type: TOGGLE_GITHUB_LINKS,
   hasGithubLinksEnabled,
+});
+
+export const toggleInfiniteScroll = inifiteScrollEnabled => ({
+  type: TOGGLE_INFINITE_SCROLL,
+  inifiteScrollEnabled,
 });
 
 export const decideCookies = cookieConsent => ({
@@ -42,6 +55,11 @@ export default (state = initialState, action) => {
       ...state,
       hasGithubLinksEnabled: action.hasGithubLinksEnabled,
     };
+  case TOGGLE_INFINITE_SCROLL:
+    return {
+      ...state,
+      inifiteScrollEnabled: action.inifiteScrollEnabled,
+    };
   case ACCEPT_COOKIES:
     return {
       ...state,
@@ -60,5 +78,5 @@ export default (state = initialState, action) => {
 // Persistence configuration
 export const persistConfig = {
   key: 'shell',
-  blacklist: ['newCacheKey'],
+  blacklist: ['newCacheKey', 'isBot'],
 };

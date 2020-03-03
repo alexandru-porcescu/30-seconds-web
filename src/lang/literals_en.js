@@ -61,6 +61,7 @@ const literals = {
   'orders.expertise': 'Expertise',
   'settings.dark_mode': 'Dark mode',
   'settings.github_links': 'GitHub links',
+  'settings.infinite_scroll': 'Infinite scroll',
   // Literals
   'Expertise': level => `${level}`,
   'Search snippets': 'Search snippets',
