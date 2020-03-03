@@ -13,7 +13,7 @@ const initialState = {
   newCacheKey: cacheKey,
   acceptsCookies: undefined,
   isBot: isBot(),
-  inifiteScrollEnabled: !isBot(),
+  infiniteScrollEnabled: !isBot(),
 };
 
 // Actions
@@ -33,9 +33,9 @@ export const toggleGithubLinks = hasGithubLinksEnabled => ({
   hasGithubLinksEnabled,
 });
 
-export const toggleInfiniteScroll = inifiteScrollEnabled => ({
+export const toggleInfiniteScroll = infiniteScrollEnabled => ({
   type: TOGGLE_INFINITE_SCROLL,
-  inifiteScrollEnabled,
+  infiniteScrollEnabled,
 });
 
 export const decideCookies = cookieConsent => ({
