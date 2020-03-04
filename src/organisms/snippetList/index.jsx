@@ -1,9 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Paginator from 'molecules/paginator';
+import { AnchorButton } from 'atoms/button';
 import Sorter from 'molecules/sorter';
 import PageTitle from 'atoms/pageTitle';
 import PageSubtitle from 'atoms/pageSubtitle';
+import { onRouteUpdate } from '../../../gatsby-browser';
 import PreviewCard from 'molecules/previewCard';
 import ListingAnchors from 'molecules/listingAnchors';
 import {
@@ -21,8 +24,22 @@ const SnippetList = ({
   listingName,
   listingType,
   listingSublinks = [],
+  infiniteScrollEnabled,
 }) => {
-  return snippetList.length ? (
+  const [previousPage, setPreviousPage] = React.useState(paginator.pageNumber > 1 ? paginator.pageNumber - 1 : null);
+  const [nextPage, setNextPage] = React.useState(paginator.pageNumber < paginator.totalPages ? paginator.pageNumber + 1 : null);
+  const [currPage, setCurrPage] = React.useState(paginator.pageNumber);
+  const [shownPages, setShownPages] = React.useState(1);
+  const [snippets, setSnippets] = React.useState(snippetList);
+  React.useEffect(() => {
+    const scrollHandler = p => () => {
+      const page = Math.ceil((document.querySelector('.content').scrollTop / (document.querySelector('.content').scrollHeight - document.querySelector('.content').clientHeight)) * (p + 1));
+      console.log(`${page <= 1 ? 1 : page >= p ? p : page} of ${p}`);
+    };
+    document.querySelector('.content').removeEventListener('scroll', scrollHandler(shownPages - 1));
+    document.querySelector('.content').addEventListener('scroll', scrollHandler(shownPages));
+  }, [shownPages]);
+  return snippets.length ? (
     <>
       {
         listingSublinks.length
@@ -33,14 +50,49 @@ const SnippetList = ({
         { listingName }
       </PageTitle>
       <Sorter sorter={ sorter } />
-      { snippetList.map(snippet => (
+      {
+        infiniteScrollEnabled && previousPage ? (
+          <AnchorButton
+            link={ {
+              internal: true,
+              url: `${paginator.baseUrl}/${paginator.slugOrderingSegment}/${previousPage}`,
+            } }
+            onClick={ e => {
+              if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
+                e.preventDefault();
+                fetch(`/page-data${paginator.baseUrl}/${paginator.slugOrderingSegment}/${previousPage}/page-data.json`)
+                  .then(response => response.json())
+                  .then(json => {
+                    console.log(shownPages);
+                    setSnippets([...json.result.pageContext.snippetList, ...snippets]);
+                    window.history.pushState(
+                      listingName,
+                      listingName,
+                      `${paginator.baseUrl}/${paginator.slugOrderingSegment}/${previousPage}`
+                    );
+                    setShownPages(shownPages + 1);
+                    onRouteUpdate({ location: `${paginator.baseUrl}/${paginator.slugOrderingSegment}/${previousPage}`});
+                    setPreviousPage(previousPage > 1 ? previousPage - 1 : null);
+                  });
+              }
+            } }>
+            Load previous
+          </AnchorButton>
+        ) : null
+      }
+      { snippets.map(snippet => (
         <PreviewCard
           key={ `snippet_${snippet.url}` }
           snippet={ snippet }
           context={ listingType }
         />
       )) }
-      <Paginator paginator={ paginator } />
+      { infiniteScrollEnabled && nextPage ? (
+        <p>Load more</p>
+      ) : (
+        <Paginator paginator={ paginator } />
+      )
+      }
     </>
   ) : null;
 };
@@ -60,4 +112,10 @@ SnippetList.propTypes = {
   listingSublinks: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
-export default SnippetList;
+
+export default connect(
+  state => ({
+    infiniteScrollEnabled: state.shell.infiniteScrollEnabled,
+  }),
+  null
+)(SnippetList);

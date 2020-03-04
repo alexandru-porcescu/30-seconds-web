@@ -18,6 +18,7 @@ const onPreRouteUpdate = ({ location, prevLocation }) => {
 };
 
 const onRouteUpdate = ({ location, prevLocation }) => {
+  console.log('happens');
   try {
     if (locationScrollTops[location.pathname])
       document.querySelector('.content').scrollTop = locationScrollTops[location.pathname];
