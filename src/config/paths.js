@@ -1,7 +1,7 @@
 // This is a server-only config, use module.exports to make things easier
 module.exports = {
   assetPath: `assets`,
-  contentPath: `${__dirname}/content`,
+  contentPath: `./content`,
   templatesPath: `./src/components/templates`,
   templates: [
     {

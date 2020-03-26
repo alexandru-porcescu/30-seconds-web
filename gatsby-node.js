@@ -20,10 +20,11 @@ const {
   parseResolvers,
   parseTemplates,
 } = require(`./src/functions/parsers`);
-const paths = require('config/paths');
+const paths = require(`./src/config/paths`);
 
 const requirables = parseRequirables(paths.contentPath);
 console.log(`${green('success')} parse requirables`);
+console.log(requirables);
 
 const reducers = parseReducers(paths.contentPath);
 console.log(`${green('success')} parse reducers`);
